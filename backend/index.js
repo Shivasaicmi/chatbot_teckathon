@@ -1,18 +1,31 @@
 import express from "express";
 import cors from "cors";
-import socket from 'socket.io';
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+import {authenticationRouter} from "./Routes/Authentication.js";
+import { validateUser } from "./middlewares/AuthenticationMiddleware.js";
+dotenv.config();
+
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 const port = 5000;
+mongoose.connect(process.env.mongodb_connection_url).then((connection)=>{
+    console.log("connected");
+}).catch((err)=>{
+    console.log(err);
+})
 
-app.get("/",(req,res)=>{
+//routes
+app.use('/authentication',authenticationRouter);
+
+
+app.get("/",validateUser,(req,res)=>{
     res.status(200).send(
         "welcome"
     )
-})
-
+});
 
 app.listen(port,(err)=>{
     if(!err){
