@@ -1,0 +1,10 @@
+1) user must be able to chat with bot
+2) chatbot should be able to respond to the user query
+3) chatbot must ask questions if any clarificaiton is needed
+4) user must be able to look at his past conversations
+5) bot should be able to raise grievance to the concerned departments
+6) user must be able to look the status of the ticket raised
+7) ---- user must be able to set the priority level of the ticket
+8) bot should understand the solution and store it in its knowledge base .
+9) bot should be able to answer the questions if the answer already exists in the knowledge base.
+10) user must have the flexibility to either choose the answer from the bot or raise the grievance.
