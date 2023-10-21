@@ -1,10 +1,10 @@
 
 import { useEffect, useState } from 'react'
 import './App.css'
-import { backend } from './AxiosInstances/AxiosInstance.js';
-import { useNavigate, Routes,Route } from 'react-router-dom';
+import { backend } from './AxiosInstances/BackendInstance.js';
+import { useNavigate, Routes,Route, Navigate } from 'react-router-dom';
 import Authentication from './Pages/Authentication/Authentication';
-import ChatPage from './Pages/Chat/ChatPage';
+import ChatPage from './Pages/Chat/ChatPage.jsx';
 
 function App() {
 
@@ -14,9 +14,14 @@ function App() {
   useEffect(()=>{
       const token = localStorage.getItem('token');
       if(token){
-        backend.post('/istokenvalid').then((response)=>{
+        backend.post('/istokenvalid',null,{
+          headers:{
+            Authorization:`Bearer ${token}`
+          }
+        }).then((response)=>{
           if(response.data.authenticated){
             setIsAuthenticated(true);
+            navigate('/chatbot')
           }
           else{
             localStorage.removeItem('token');
@@ -35,17 +40,17 @@ function App() {
   },[])
   return (
     <>
-      {
-        isAuthenticated? 
+     
         <Routes>
-            <Route path='/authentication' element={<Authentication/>} />
-            <Route path='/chatbot' element={<ChatPage/>} />
+            <Route path='/authentication' element={<Authentication setAuthentication={setIsAuthenticated} />} />
+            <Route path='/chatbot' element={ 
+              isAuthenticated? 
+              <ChatPage/>:
+              <Navigate to="/authentication?mode=login"  />
+            
+            } />
         </Routes>
-        :
-        <Routes>
-            <Route path='/authentication' element={<Authentication/>} />
-        </Routes>
-      }
+        
    </>
   )
 }
