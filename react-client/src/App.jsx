@@ -30,6 +30,15 @@ function App() {
               mode:'login'
             });
           }
+        }).catch(err=>{
+          console.log(err);
+          if(err.response && !err.response.authenticated){
+            localStorage.removeItem('token');
+            setIsAuthenticated(false);
+            navigate('/authentication',{
+              mode:'login'
+            });
+          }
         })
       }
       else{

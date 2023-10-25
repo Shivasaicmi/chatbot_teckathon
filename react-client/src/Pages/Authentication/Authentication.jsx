@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import {backend} from "../../AxiosInstances/BackendInstance";
 
@@ -47,7 +47,7 @@ function Authentication({setAuthentication}) {
             if(token){
                 localStorage.setItem('token',token);
                 setAuthentication(true);
-                navigate('/chatbot')
+                navigate('/chatbot');
             }
         }).catch((err)=>{
             console.log("failed to login the user");

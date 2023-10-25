@@ -4,7 +4,9 @@ export function generateToken(userEmail,userName){
         userEmail,userName
     };
     const secret_jwt_key = process.env.JWT_SECRET_KEY;
-    const token = jwt.sign(data,secret_jwt_key);
+    const token = jwt.sign(data,secret_jwt_key,{
+        expiresIn:'24h'
+    });
     if(!token){
         return null;
     }
@@ -13,9 +15,16 @@ export function generateToken(userEmail,userName){
 
 export function validateToken(token){
     const secret_jwt_key = process.env.JWT_SECRET_KEY;
-    const validToken = jwt.verify(token,secret_jwt_key);
-    if(validToken){
-        return true;
+    try{
+        const userDetails = jwt.verify(token,secret_jwt_key);
+        if(userDetails){
+            return userDetails;
+        }
+        return null;
+        
     }
-    return false;
+    catch(error){
+        return null;
+    }
+    
 }
