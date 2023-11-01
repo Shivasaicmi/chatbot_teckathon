@@ -1,5 +1,7 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-mixed-spaces-and-tabs */
 import { useEffect, useRef, useState } from "react";
-import io, { Socket } from 'socket.io-client';
+import io from 'socket.io-client';
 import { useNavigate } from "react-router-dom";
 function ChatPage() {
 
@@ -11,7 +13,7 @@ function ChatPage() {
 
   const token = localStorage.getItem('token');
 
-  const [socket,setSocket] = useState(()=>{
+  const [socket] = useState(()=>{
 	console.log("setting the socket ");
 
 	return io('http://localhost:8080/chat',{auth:{token:token?token:null}})
@@ -42,8 +44,9 @@ function ChatPage() {
   useEffect(()=>{
 	function recieveMessage(){
 		socket.on('recieveMessage',(messages)=>{
+			console.log(messages);
 			setMessages((previousSate)=>{
-				return [...previousSate,messages];
+				return [...previousSate,...messages];
 			})
 		})
 	}
@@ -73,8 +76,9 @@ function ChatPage() {
 	const message = inputRef.current.value;
 	if(message&&currentRoomId){
 		console.log("sending the message ",message);
-		socket.emit('sendMessage',message,currentRoomId,(responseData)=>{
+		socket.emit('sendMessage',message,currentRoomId,(responseData,error)=>{
 			console.log(responseData);
+			console.log(error);
 		});
 		inputRef.current.value = "";
 	}
@@ -82,7 +86,11 @@ function ChatPage() {
 
   function joinRoom(roomId){
 	if(roomId){
-		socket.emit('joinRoom',roomId,(joinedRoom,err)=>{
+		socket.emit('joinRoom',roomId,(joinedRoom,error)=>{
+			if(error){
+				alert("cannot fetch chats");
+				return;
+			}
 			if(joinedRoom){
 				getMessagesOfRoom();
 				setChatHistory((previousSate)=>{
@@ -105,7 +113,7 @@ function ChatPage() {
 
   function createChatRoom(){
 	const roomName = chatNameRef.current.value;
-	socket.emit('createRoom',roomName,(response,err)=>{
+	socket.emit('createRoom',roomName,(response,_err)=>{
 		if(response){
 			setChatHistory((previousState)=>{
 				return [...previousState,response];
@@ -153,7 +161,7 @@ function ChatPage() {
 				messages.map((chat,index)=>{
 					return <div key={index}  >
 						<h1 style={{
-							textAlign:chat.userName === 'shivasai'? 'left':'right'		
+							textAlign:chat.userName === 'chatbot'? 'right':'left'		
 						}} > {chat.message} </h1>	
 					</div>
 				})

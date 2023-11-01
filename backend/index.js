@@ -14,6 +14,7 @@ dotenv.config();
 
 const app = express();
 import {Server } from 'socket.io';
+import { chatBot } from "./AIBot/index.js";
 const socketServer = new Server(8080,{
     cors:{
         origin:['http://127.0.0.1:3000','http://localhost:3000']
@@ -54,21 +55,29 @@ mongoose.connect(process.env.mongodb_connection_url).then(()=>{
 })
 
 chatIo.on('connection',(socket)=>{
-    console.log("connected witht client ",socket.id);
     socket.on('sendMessage',async (message,roomId,acknowledge)=>{
-        const new_message = {
-            userName:socket.userName,
-            message:message,
-            timeStamp:new Date()
-        }
+        
         try{
+            const new_user_message = {
+                userName:socket.userName,
+                message:message,
+                timeStamp:new Date()
+            }
+            const response = await chatBot.respondToTheMessage(message);
+            const new_chatbot_message = {
+                userName:'chatbot',
+                message:response.text,
+                timeStamp:new Date()
+            }
             const updated = await RoomModel.updateOne({roomId:roomId},{
                 "$push":{
-                    "chats":new_message
+                    "chats":{
+                        "$each":[new_user_message,new_chatbot_message]
+                    }
                 }
             });
             if(updated && updated.modifiedCount>0){
-                chatIo.to(roomId).emit('recieveMessage',new_message);
+                chatIo.to(roomId).emit('recieveMessage',[new_user_message,new_chatbot_message]);
                 return;
             }  
 
@@ -76,6 +85,7 @@ chatIo.on('connection',(socket)=>{
        
         }
         catch(error){
+            console.log(error);
             acknowledge(null,new Error("Internal server error unable to send the message"));
         }
        

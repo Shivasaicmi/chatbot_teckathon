@@ -3,9 +3,10 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import {backend} from "../../AxiosInstances/BackendInstance";
 
+// eslint-disable-next-line react/prop-types
 function Authentication({setAuthentication}) {
 
-    const [params,setParams] = useSearchParams();
+    const [params] = useSearchParams();
     const [mode,setMode] = useState(params.mode);
     const navigate = useNavigate();
 
