@@ -7,10 +7,8 @@ import { validateUser } from "./middlewares/AuthenticationMiddleware.js";
 import { validateToken } from "./jwtUtils/jwtUtils.js";
 import { nanoid } from "nanoid";
 import { RoomModel } from "./db_schemas/chat.js";
+import "web-streams-polyfill/dist/polyfill.es6.js";
 dotenv.config();
-
-
-
 
 const app = express();
 import {Server } from 'socket.io';
