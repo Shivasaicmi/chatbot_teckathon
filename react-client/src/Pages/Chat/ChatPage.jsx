@@ -46,7 +46,7 @@ function ChatPage() {
 		socket.on('recieveMessage',(messages)=>{
 			console.log(messages);
 			setMessages((previousSate)=>{
-				return [...previousSate,...messages];
+				return [...previousSate,messages];
 			})
 		})
 	}
@@ -76,6 +76,15 @@ function ChatPage() {
 	const message = inputRef.current.value;
 	if(message&&currentRoomId){
 		console.log("sending the message ",message);
+		setMessages((previousState)=>{
+			const new_user_message = {
+				type:'human',
+				data:{
+					content:message
+				}
+			}
+			return [...previousState,new_user_message]
+		})
 		socket.emit('sendMessage',message,currentRoomId,(responseData,error)=>{
 			console.log(responseData);
 			console.log(error);
@@ -161,8 +170,8 @@ function ChatPage() {
 				messages.map((chat,index)=>{
 					return <div key={index}  >
 						<h1 style={{
-							textAlign:chat.userName === 'chatbot'? 'right':'left'		
-						}} > {chat.message} </h1>	
+							textAlign:chat.type === 'ai'? 'right':'left'		
+						}} > {chat.data.content} </h1>	
 					</div>
 				})
 			}

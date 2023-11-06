@@ -58,31 +58,19 @@ chatIo.on('connection',(socket)=>{
     socket.on('sendMessage',async (message,roomId,acknowledge)=>{
         
         try{
-            const new_user_message = {
-                userName:socket.userName,
-                message:message,
-                timeStamp:new Date()
-            }
-            const response = await chatBot.respondToTheMessage(message);
-            const new_chatbot_message = {
-                userName:'chatbot',
-                message:response.text,
-                timeStamp:new Date()
-            }
-            const updated = await RoomModel.updateOne({roomId:roomId},{
-                "$push":{
-                    "chats":{
-                        "$each":[new_user_message,new_chatbot_message]
+            const responseWithContext = await chatBot.respondWithContext(roomId,message);
+            console.log(responseWithContext);
+            if(responseWithContext){
+                const new_chatbot_message = {
+                    type:'ai',
+                    data:{
+                        content:responseWithContext.response
                     }
                 }
-            });
-            if(updated && updated.modifiedCount>0){
-                chatIo.to(roomId).emit('recieveMessage',[new_user_message,new_chatbot_message]);
+                chatIo.to(roomId).emit('recieveMessage',new_chatbot_message);
+                acknowledge(null,new Error("unable to send the message"));
                 return;
-            }  
-
-            acknowledge(null,new Error("unable to send the message"));
-       
+            }
         }
         catch(error){
             console.log(error);
@@ -100,7 +88,7 @@ chatIo.on('connection',(socket)=>{
             roomName:roomName,
             userEmail:userEmail,
             users:[userName],
-            chats:[]
+            messages:[]
         }
 
         const room = await RoomModel.create(new_room);
@@ -121,7 +109,8 @@ chatIo.on('connection',(socket)=>{
             if(rooms){
                 socket.join(roomId);
                 console.log("Joined the room ",roomId);
-                acknowledge(rooms.chats,null);
+                console.log(rooms);
+                acknowledge(rooms.messages,null);
                 return;
             }
             else{

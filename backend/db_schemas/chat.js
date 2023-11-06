@@ -1,10 +1,5 @@
 import mongoose from "mongoose";
 
-const messageSchema = mongoose.Schema({
-    userName:String,
-    message:String,
-    timeStamp:Date
- })
 
 const roomSchema = mongoose.Schema({
     roomName:String,
@@ -14,7 +9,6 @@ const roomSchema = mongoose.Schema({
         type:String,
         unique:true
     },
-    chats:[messageSchema]
 });
 
 
