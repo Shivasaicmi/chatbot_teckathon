@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { backend } from "../../AxiosInstances/BackendInstance";
+import img from './chatbot.webp'
 
 function Authentication({ setAuthentication }) {
   const [params] = useSearchParams();
@@ -75,33 +76,37 @@ function Authentication({ setAuthentication }) {
   }
 
   return (
-    <section className="h-screen w-screen flex">
-      <div className="authentication-left bg-purple-500 w-1/2 h-full"></div>
-      <div className="authentication-right bg-gray-300 w-1/2 flex justify-center items-center h-full">
+    <section className="h-screen w-screen flex" align="center">
+      <div className="authentication-left bg-primary w-1/2 h-full">
+        <div class="s-blob-main"> 
+          <img class="hidden md:block w-40 s-blob-main-logo element-center ls-is-cached lazyloaded" src="https://xebia.com/apac/wp-content/uploads/sites/2/2021/11/XebiaLogo-white.svg" alt="xebia domains" data-src="https://xebia.com/apac/wp-content/uploads/sites/2/2021/11/XebiaLogo-white.svg" decoding="async" style={{height:"100vh", marginLeft:"40%"}}/>
+        </div>
+      </div>
+      <div className="authentication-right bg-success w-1/2 flex justify-center items-center h-full">
         <div className="authenticate-form-container w-2/5">
-          <h1 className="text-purple-500 text-center text-3xl mb-7 capitalize font-medium">
+          <h1 className="text-primary text-center text-3xl mb-7 capitalize font-medium">
             {mode}
           </h1>
           <form onSubmit={authenticate} className="flex flex-col gap-3 authenticate-form">
             <input
               ref={userNameRef}
-              className="h-12 w-full rounded-lg pl-3 bg-white border-2 focus:outline-none focus:border-purple-500"
+              className="h-12 w-full rounded-lg pl-3 bg-secondary border-2 focus:outline-none focus:border-primary"
               placeholder="Username"
               type="text"
             />
             <input
               ref={emailRef}
-              className="h-12 w-full rounded-lg pl-3 bg-white border-2 focus:outline-none focus:border-purple-500"
+              className="h-12 w-full rounded-lg pl-3 bg-secondary border-2 focus:outline-none focus:border-primary"
               placeholder="Email"
               type="email"
             />
             <input
               ref={passwordRef}
-              className="h-12 w-full rounded-lg pl-3 bg-white border-2 focus:outline-none focus:border-purple-500"
+              className="h-12 w-full rounded-lg pl-3 bg-secondary border-2 focus:outline-none focus:border-primary"
               placeholder="Password"
               type="password"
             />
-            <button className="w-full h-12 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition duration-300" type="submit">
+            <button className="w-full h-12 bg-primary text-secondary rounded-lg hover:bg-primary transition duration-300" type="submit">
               {mode}
             </button>
           </form>
@@ -109,14 +114,14 @@ function Authentication({ setAuthentication }) {
             {mode === "login" ? (
               <span>
                 New user?{" "}
-                <Link to="/authentication?mode=register" className="text-purple-500">
+                <Link to="/authentication?mode=register" className="text-primary">
                   Register
                 </Link>
               </span>
             ) : (
               <span>
                 Already have an account?{" "}
-                <Link to="/authentication?mode=login" className="text-purple-500">
+                <Link to="/authentication?mode=login" className="text-primary">
                   Login
                 </Link>
               </span>

@@ -106,25 +106,13 @@ function ChatPage() {
 
   return (
     <section className="h-screen w-screen flex p-5">
-      <div className="chat_history h-full w-1/4 p-5 bg-purple-500 rounded-lg">
+      <div className="chat_history h-full w-1/4 p-5 bg-success rounded-lg">
         <div className="lavender-bg p-4 rounded-lg">
-          <input ref={chatNameRef} type="text" placeholder="Enter chat name" className="w-full h-9 mb-5 rounded-lg pl-3 bg-gray-200 text-black" />
-          <button onClick={createChatRoom} className="bg-purple-700 text-white w-full h-8 rounded-xl hover:bg-purple-800 transition-colors duration-300 ease-in-out">
+          <input ref={chatNameRef} type="text" placeholder="Enter chat name" className="w-full h-9 mb-5 rounded-lg pl-3 lavender-bg text-black" />
+          <button onClick={createChatRoom} className="bg-primary text-white w-full h-8 rounded-xl hover:bg-hover transition-colors duration-300 ease-in-out">
             New chat
           </button>
-          <div className="border-t border-b border-purple-600 my-5"></div>
-          <input ref={roomNameRef} type="text" placeholder="Enter room ID" className="w-full h-9 mb-5 rounded-lg pl-3 bg-gray-200 text-black" />
-          <button onClick={() => {
-            const roomId = roomNameRef.current.value;
-            if (roomId) {
-              joinRoom(roomId);
-              roomNameRef.current.value = "";
-            } else {
-              alert("Enter a room ID");
-            }
-          }} className="bg-purple-700 text-white w-full h-8 rounded-xl hover-bg-purple-800 transition-colors duration-300 ease-in-out">
-            Join chat
-          </button>
+          <div className="border-t border-b border-primary my-5"></div>
         </div>
         <div className="chats mt-10 flex flex-col gap-4">
           {chatHistory.map((room, index) => (
@@ -134,25 +122,31 @@ function ChatPage() {
                 setCurrentRoomId(room.roomId);
                 getMessagesOfRoom(room.roomId);
               }}
-              className="w-full pt-2 pb-2 rounded-md bg-gray-200 hover-bg-gray-300 text-black hover-text-black transition-colors duration-300 ease-in-out">
+              className="w-full pt-2 pb-2 rounded-md bg-primary hover:bg-hover text-white hover-text-black transition-colors duration-300 ease-in-out">
               {room.roomName}
             </button>
           ))}
         </div>
       </div>
-      <div className="chat_window w-3/4 pl-5 pr-5 bg-gray-300 rounded-lg">
-        <div className="chat_messages h-5/6 overflow-y-auto">
+      <div className="chat_window w-3/4 pl-5 pr-5 bg-secondary rounded-lg">
+        <div className="chat_messages h-5/6 overflow-y-auto flex flex-col gap-3">
           {messages.map((chat, index) => (
-            <div key={index} className={`mb-2 ${chat.userName === 'chatbot' ? 'text-left' : 'text-right'}`}>
-              <div className={`rounded p-3 ${chat.userName === 'chatbot' ? 'bg-purple-100 text-purple-900' : 'bg-purple-300 text-purple-900'} border border-purple-300 inline-block`}>
+            <div key={index} className="max-w-[100%]">
+              <div
+                className={`rounded-2xl p-3 ${
+                  chat.userName === 'chatbot'
+                    ? 'bg-purple-500 text-secondary float-left max-w-[70%] border border-primary inline-block mb-1'
+                    : 'bg-success text-black-900 float-right max-w-[70%] border border-black inline-block mb-1 mr-3'
+                } `}
+              >
                 {chat.message}
               </div>
             </div>
           ))}
         </div>
-        <form className="w-full flex justify-between" onSubmit={handleSubmit}>
-          <input className="h-10 w-3/4 border border-purple-300 rounded-l pl-3" ref={inputRef} type="text" placeholder="Enter the message" />
-          <button className="w-1/4 bg-purple-700 text-white rounded-r p-3 hover-bg-purple-800 transition-colors duration-300 ease-in-out">
+        <form className="w-full flex justify-between" onSubmit={handleSubmit} >
+          <input className="h-10 w-3/4 border border-primary rounded-l pl-3" ref={inputRef} type="text" placeholder="Enter the message" />
+          <button className="w-1/4 bg-primary text-secondary rounded-r p-2 hover:bg-hover transition-colors duration-300 ease-in-out">
             Send
           </button>
         </form>
