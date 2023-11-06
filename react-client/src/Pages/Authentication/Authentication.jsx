@@ -71,6 +71,7 @@ function Authentication({setAuthentication}) {
             console.log("failed to regsiter the user");
             setAuthentication(false);
             console.log(err);
+            
         })
     }
 
