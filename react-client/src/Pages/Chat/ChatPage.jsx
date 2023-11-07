@@ -140,10 +140,10 @@ function ChatPage() {
           {messages.map((chat, index) => (
             <div key={index} className="max-w-[100%]">
               <div
-                className={`rounded-2xl p-3 ${
+                className={`rounded-3xl p-3 ${
                   chat.userName === 'chatbot'
                     ? 'bg-primary text-secondary float-left max-w-[70%] border border-primary inline-block mb-1'
-                    : 'bg-success text-black-900 float-right max-w-[70%] border border-black inline-block mb-1 mr-3'
+                    : 'bg-success text-black-900 float-right max-w-[70%] border inline-block mb-1 mr-3'
                 } `}
               >
                 {chat.message}
