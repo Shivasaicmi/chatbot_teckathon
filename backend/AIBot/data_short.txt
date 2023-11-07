@@ -1,0 +1,19 @@
+Title:Human Resources
+Description: Human resource (HR) teams handle a wide range of employee grievances. These grievances can be broadly categorized into the following types:
+Pay and benefits,Work conditions,Management practices,Harassment and discrimination,Disciplinary actions,Promotion and recognition,Termination of employment.
+HR teams play a crucial role in addressing employee grievances in a fair, impartial, and timely manner.
+
+Title: ICT
+Description: ICT teams handle a wide range of grievances related to IT infrastructure, systems, and services. These grievances can be broadly categorized into the following types:
+Hardware issues,Software issues,Email issues,Hosting issues,Systems issues,Network issues,General IT support.
+ICT teams play a crucial role in ensuring that the organization's IT infrastructure is reliable, secure, and efficient.
+
+Title: Finance
+Description: The finance team in a software organization handles a wide range of grievances, including:
+Payroll issues,Expense reimbursement issues,Accounts receivable issues,Accounts payable issues,Financial reporting issues,Tax compliance issues
+The finance team plays a crucial role in ensuring that the organization's financial records are accurate and compliant with all applicable laws and regulations.
+
+Title: Travel, Hospitality and Admin
+Description: The Travel, Hospitality, and Admin team provides general administrative support, including:
+Scheduling meetings,Preparing documents,Providing information about company policies
+The Travel, Hospitality, and Admin team plays a crucial role in ensuring that the organization runs smoothly and efficiently.

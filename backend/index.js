@@ -56,35 +56,16 @@ chatIo.on('connection',(socket)=>{
     socket.on('sendMessage',async (message,roomId,acknowledge)=>{
         
         try{
-            const new_user_message = {
-                userName:socket.userName,
-                message:message,
-                timeStamp:new Date()
-            }
-            const response = await chatBot.respondToTheMessage(message);
+            const response = await chatBot.respondWithContext(roomId,message);
+            console.log(response);
             const new_chatbot_message = {
-                userName:'chatbot',
-                message:response.text,
-                timeStamp:new Date()
-            }
-            
-            const updated = await RoomModel.updateOne({roomId:roomId},{
-                "$push":{
-                    "chats":{
-                        "$each":[new_user_message,new_chatbot_message]
-                    }
-                }
-            });
-            if(updated && updated.modifiedCount>0){
-                chatIo.to(roomId).emit('recieveMessage',[new_user_message,new_chatbot_message]);
-                return;
-            }  
+                type:'ai',
+                data:{content:response.response},
 
-            acknowledge(null,new Error("unable to send the message"));
-       
+            }
+            chatIo.to(roomId).emit('recieveMessage',new_chatbot_message);   
         }
         catch(error){
-            console.log(error);
             acknowledge(null,new Error("Internal server error unable to send the message"));
         }
        
@@ -120,7 +101,7 @@ chatIo.on('connection',(socket)=>{
             if(rooms){
                 socket.join(roomId);
                 console.log("Joined the room ",roomId);
-                acknowledge(rooms.chats,null);
+                acknowledge(rooms.messages,null);
                 return;
             }
             else{
