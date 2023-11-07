@@ -67,6 +67,7 @@ chatIo.on('connection',(socket)=>{
                 message:response.text,
                 timeStamp:new Date()
             }
+            
             const updated = await RoomModel.updateOne({roomId:roomId},{
                 "$push":{
                     "chats":{

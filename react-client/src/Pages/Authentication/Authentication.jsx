@@ -55,25 +55,26 @@ function Authentication({ setAuthentication }) {
         console.log(err);
       });
   }
+ 
+       
 
-  function register(userCredentials) {
-    console.log("trying to register the user");
-    backend
-      .post("/authentication/register", userCredentials)
-      .then((response) => {
-        const token = response.data.token;
-        if (token) {
-          localStorage.setItem("token", token);
-          setAuthentication(true);
-          navigate("/chatbot");
-        }
-      })
-      .catch((err) => {
-        console.log("failed to register the user");
-        setAuthentication(false);
-        console.log(err);
-      });
-  }
+
+    function register(userCredentials){
+        console.log("trying to register the user");
+        backend.post('/authentication/register',userCredentials).then((response)=>{
+            const token = response.data.token;
+            if(token){
+                localStorage.setItem('token',token);
+                setAuthentication(true)
+                navigate('/chatbot')
+            }
+        }).catch((err)=>{
+            console.log("failed to regsiter the user");
+            setAuthentication(false);
+            console.log(err);
+            
+        })
+    }
 
   return (
     <section className="h-screen w-screen flex" align="center">
