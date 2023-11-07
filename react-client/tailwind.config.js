@@ -12,6 +12,7 @@ export default {
       hover: '#9B30FF',
       input: '#33475b',
       border: '#cbd6e2',
+      next: '#3d1d35',
     }},
   },
   plugins: [],

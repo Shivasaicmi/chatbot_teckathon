@@ -12,6 +12,7 @@ function ChatPage() {
   const [messages, setMessages] = useState([]);
   const [chatHistory, setChatHistory] = useState([]);
   const [currentRoomId, setCurrentRoomId] = useState(null);
+  const [chatRoomError, setChatRoomError] = useState(false);
 
   useEffect(() => {
     function connectToChatSession() {
@@ -92,11 +93,17 @@ function ChatPage() {
 
   function createChatRoom() {
     const roomName = chatNameRef.current.value;
+    if(roomName === "")
+    {
+      setChatRoomError(true);
+      return ;
+    }
     socket.emit('createRoom', roomName, (response, _err) => {
       if (response) {
         setChatHistory((previousState) => {
           return [...previousState, response];
         });
+        setChatRoomError(false);
       } else {
         console.warn("Room cannot be created");
       }
@@ -108,13 +115,13 @@ function ChatPage() {
     <section className="h-screen w-screen flex p-5">
       <div className="chat_history h-full w-1/4 p-5 bg-success rounded-lg">
         <div className="lavender-bg p-4 rounded-lg">
-          <input ref={chatNameRef} type="text" placeholder="Enter chat name" className="w-full h-9 mb-5 rounded-lg pl-3 lavender-bg text-black" />
-          <button onClick={createChatRoom} className="bg-primary text-white w-full h-8 rounded-xl hover:bg-hover transition-colors duration-300 ease-in-out">
+          <input ref={chatNameRef} type="text" placeholder="Enter chat name" className={`w-full h-9 mb-5 rounded-lg pl-3 lavender-bg text-black ${ chatRoomError ?'border border-red-500':''}`}/>
+          <button onClick={createChatRoom} className="bg-next text-white w-full h-8 rounded-xl hover:bg-primary transition-colors duration-300 ease-in-out">
             New chat
           </button>
           <div className="border-t border-b border-primary my-5"></div>
         </div>
-        <div className="chats mt-10 flex flex-col gap-4">
+        <div className="chats flex flex-col gap-4">
           {chatHistory.map((room, index) => (
             <button
               key={index}
@@ -122,7 +129,7 @@ function ChatPage() {
                 setCurrentRoomId(room.roomId);
                 getMessagesOfRoom(room.roomId);
               }}
-              className="w-full pt-2 pb-2 rounded-md bg-primary hover:bg-hover text-white hover-text-black transition-colors duration-300 ease-in-out">
+              className="w-full pt-2 pb-2 rounded-md bg-next hover:bg-primary text-white hover-text-black transition-colors duration-300 ease-in-out">
               {room.roomName}
             </button>
           ))}
@@ -135,7 +142,7 @@ function ChatPage() {
               <div
                 className={`rounded-2xl p-3 ${
                   chat.userName === 'chatbot'
-                    ? 'bg-purple-500 text-secondary float-left max-w-[70%] border border-primary inline-block mb-1'
+                    ? 'bg-primary text-secondary float-left max-w-[70%] border border-primary inline-block mb-1'
                     : 'bg-success text-black-900 float-right max-w-[70%] border border-black inline-block mb-1 mr-3'
                 } `}
               >
@@ -146,7 +153,7 @@ function ChatPage() {
         </div>
         <form className="w-full flex justify-between" onSubmit={handleSubmit} >
           <input className="h-10 w-3/4 border border-primary rounded-l pl-3" ref={inputRef} type="text" placeholder="Enter the message" />
-          <button className="w-1/4 bg-primary text-secondary rounded-r p-2 hover:bg-hover transition-colors duration-300 ease-in-out">
+          <button className="w-1/4 bg-next text-secondary rounded-r p-2 hover:bg-primary transition-colors duration-300 ease-in-out">
             Send
           </button>
         </form>
