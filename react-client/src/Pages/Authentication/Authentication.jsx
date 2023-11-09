@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { backend } from "../../AxiosInstances/BackendInstance";
-import img from './chatbot.webp'
 
+// eslint-disable-next-line react/prop-types
 function Authentication({ setAuthentication }) {
   const [params] = useSearchParams();
   const [mode, setMode] = useState(params.mode);
@@ -77,10 +77,11 @@ function Authentication({ setAuthentication }) {
     }
 
   return (
+    // eslint-disable-next-line react/no-unknown-property
     <section className="h-screen w-screen flex" align="center">
       <div className="authentication-left bg-primary w-1/2 h-full">
-        <div class="s-blob-main"> 
-          <img class="hidden md:block w-40 s-blob-main-logo element-center ls-is-cached lazyloaded" src="https://xebia.com/apac/wp-content/uploads/sites/2/2021/11/XebiaLogo-white.svg" alt="xebia domains" data-src="https://xebia.com/apac/wp-content/uploads/sites/2/2021/11/XebiaLogo-white.svg" decoding="async" style={{height:"100vh", marginLeft:"40%"}}/>
+        <div className="s-blob-main"> 
+          <img className="hidden md:block w-40 s-blob-main-logo element-center ls-is-cached lazyloaded" src="https://xebia.com/apac/wp-content/uploads/sites/2/2021/11/XebiaLogo-white.svg" alt="xebia domains" data-src="https://xebia.com/apac/wp-content/uploads/sites/2/2021/11/XebiaLogo-white.svg" decoding="async" style={{height:"100vh", marginLeft:"40%"}}/>
         </div>
       </div>
       <div className="authentication-right bg-success w-1/2 flex justify-center items-center h-full">

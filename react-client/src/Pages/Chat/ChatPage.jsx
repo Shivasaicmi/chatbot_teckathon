@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useRef, useState } from "react";
 import io from 'socket.io-client';
 import { useNavigate } from "react-router-dom";
@@ -6,7 +7,6 @@ function ChatPage() {
   const navigate = useNavigate();
   const inputRef = useRef(null);
   const chatNameRef = useRef(null);
-  const roomNameRef = useRef(null);
   const token = localStorage.getItem('token');
   const [socket] = useState(() => io('http://localhost:8080/chat', { auth: { token: token ? token : null } }));
   const [messages, setMessages] = useState([]);
@@ -28,9 +28,9 @@ function ChatPage() {
 
   useEffect(() => {
     function recieveMessage() {
-      socket.on('recieveMessage', (messages) => {
+      socket.on('recieveMessage', (message) => {
         setMessages((previousState) => {
-          return [...previousState, ...messages];
+          return [...previousState,message];
         });
       });
     }
@@ -55,6 +55,15 @@ function ChatPage() {
   function handleSubmit(event) {
     event.preventDefault();
     const message = inputRef.current.value;
+	const newHumanMessage = {
+		type:'human',
+		data:{
+			content:message
+		}
+	}
+	setMessages((previousMessages)=>{
+		return [...previousMessages,newHumanMessage];
+	})
     if (message && currentRoomId) {
       socket.emit('sendMessage', message, currentRoomId, (responseData, error) => {
         console.log(responseData);
@@ -98,7 +107,7 @@ function ChatPage() {
       setChatRoomError(true);
       return ;
     }
-    socket.emit('createRoom', roomName, (response, _err) => {
+    socket.emit('createRoom', roomName, (response,_err) => {
       if (response) {
         setChatHistory((previousState) => {
           return [...previousState, response];
@@ -136,24 +145,25 @@ function ChatPage() {
         </div>
       </div>
       <div className="chat_window w-3/4 pl-5 pr-5 bg-secondary rounded-lg">
-        <div className="chat_messages h-5/6 overflow-y-auto flex flex-col gap-3">
+        <div className="chat_messages h-[90%] overflow-y-auto flex flex-col gap-6">
           {messages.map((chat, index) => (
             <div key={index} className="max-w-[100%]">
               <div
                 className={`rounded-2xl p-3 ${
-                  chat.userName === 'chatbot'
-                    ? 'bg-primary text-secondary float-left max-w-[70%] border border-primary inline-block mb-1'
-                    : 'bg-success text-black-900 float-right max-w-[70%] border border-black inline-block mb-1 mr-3'
+                  chat.type === 'ai'
+                    ? 'bg-primary text-secondary float-left max-w-[55%] border inline-block mb-1'
+                    : 'bg-success text-black-900 float-right max-w-[55%] border-black  border inline-block mb-1 mr-3'
                 } `}
               >
-                {chat.message}
+                {chat.data.content}
               </div>
             </div>
           ))}
+		<div className="empty container h-4 " ></div>
         </div>
-        <form className="w-full flex justify-between" onSubmit={handleSubmit} >
+        <form className="w-full mt-5 flex justify-between" onSubmit={handleSubmit} >
           <input className="h-10 w-3/4 border border-primary rounded-l pl-3" ref={inputRef} type="text" placeholder="Enter the message" />
-          <button className="w-1/4 bg-next text-secondary rounded-r p-2 hover:bg-primary transition-colors duration-300 ease-in-out">
+          <button className="w-[20%] bg-next text-secondary rounded-r p-2 hover:bg-primary transition-colors duration-300 ease-in-out">
             Send
           </button>
         </form>

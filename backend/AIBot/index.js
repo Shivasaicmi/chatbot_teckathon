@@ -1,33 +1,23 @@
 import { openAiModel } from "./ChatModel.js";
-import { BufferMemory } from "langchain/memory";
 import { ConversationChain } from "langchain/chains";
-import { MongoDBChatMessageHistory } from "langchain/stores/message/mongodb";
-import { RoomModel } from '../db_schemas/chat.js';
+import { chatMemory } from "./chatMemory.js";
+import { PromptTemplate } from "langchain/prompts";
 
-
-async function trainModelWithContext(roomId){
-    console.log("querying for roomId",roomId);
-    console.log(roomId);
-    const roomObject = await RoomModel.findOne({roomId:roomId});
-    const sessionId = roomObject._id;
-    const collection = await RoomModel.prototype.collection;
-    const memory = new BufferMemory({
-        chatHistory: new MongoDBChatMessageHistory({
-          collection,
-          sessionId,
-        }),
-    });
-    return memory;
-}
 
 async function respondWithContext(roomId,message){
     console.log("recieved message");
-    const memory = await trainModelWithContext(roomId);
-    const chain = new ConversationChain({ llm: openAiModel, memory });
+    // const promptTemplate = new PromptTemplate({
+    //     inputVariables:['grievance'],
+    //     template: `The user is an employee of an IT company,
+    //                 and trying to log a grievance ,help the user , the user prompt is {grievance}, If the user prompt seems irrelavant, respond with some questions or ask user to give the relavant prompt  `
+    // })
+    const memory = await chatMemory.getChatMemoryByRoomId(roomId);
+    const chain = new ConversationChain({ llm: openAiModel, memory:memory });
     const response = await chain.call({input:message});
     console.log("responding to the message");
     return response;
 }
+
 
 export const chatBot = {
     respondWithContext
