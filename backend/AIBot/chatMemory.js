@@ -5,12 +5,14 @@ import { RoomModel } from '../db_schemas/chat.js';
 class ChatMemory {
 
     chatMemory = {};
+    
+
 
     async getChatMemoryByRoomId(roomId){
         if(this.chatMemory[roomId]){
             return this.chatMemory[roomId];
         }else{
-            const memory =  this.trainModelWithMemory(roomId);
+            const memory = await this.trainModelWithMemory(roomId);
             this.chatMemory[roomId] = memory;
             return memory;
         }
@@ -30,7 +32,7 @@ class ChatMemory {
         return memory;
     }
 
-    
+
     deleteMemory(roomId){
         delete this.chatMemory[roomId];
     }
