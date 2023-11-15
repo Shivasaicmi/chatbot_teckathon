@@ -5,8 +5,6 @@ import { RoomModel } from '../db_schemas/chat.js';
 class ChatMemory {
 
     chatMemory = {};
-    
-
 
     async getChatMemoryByRoomId(roomId){
         if(this.chatMemory[roomId]){
@@ -18,20 +16,23 @@ class ChatMemory {
         }
     }
 
-
     async trainModelWithMemory(roomId){
-        const roomObject = await RoomModel.findOne({roomId:roomId});
-        const sessionId = roomObject._id;
-        const collection = await RoomModel.prototype.collection;
-        const memory = new BufferMemory({
-            chatHistory: new MongoDBChatMessageHistory({
-                collection,
-                sessionId,
-            }),
-        });
-        return memory;
+        try{
+            const roomObject = await RoomModel.findOne({roomId:roomId});
+            const sessionId = roomObject._id;
+            const collection = await RoomModel.prototype.collection;
+            const memory = new BufferMemory({
+                chatHistory: new MongoDBChatMessageHistory({
+                    collection,
+                    sessionId,
+                }),
+            });
+            return memory;
+        }
+        catch(err){
+            console.log(err);
+        }
     }
-
 
     deleteMemory(roomId){
         delete this.chatMemory[roomId];

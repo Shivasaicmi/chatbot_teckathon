@@ -57,7 +57,6 @@ chatIo.on('connection',(socket)=>{
         
         try{
             const response = await chatBot.respondWithContext(roomId,message);
-            console.log(response);
             const new_chatbot_message = {
                 type:'ai',
                 data:{content:response.response},
