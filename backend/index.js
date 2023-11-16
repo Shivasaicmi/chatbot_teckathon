@@ -56,10 +56,17 @@ chatIo.on('connection',(socket)=>{
     socket.on('sendMessage',async (message,roomId,acknowledge)=>{
         
         try{
-            const response = await chatBot.respondWithContext(roomId,message);
+           // const response = await chatBot.respondWithContext(roomId,message);
+           try{
+            const response = await chatBot.getChatAgentResponse(message);
+           console.log("Chat agent's Response "+response);
+           }
+           catch(err){
+            console.log(err);
+           }
             const new_chatbot_message = {
                 type:'ai',
-                data:{content:response.response},
+                data:{content:"hello"},
 
             }
             chatIo.to(roomId).emit('recieveMessage',new_chatbot_message);   

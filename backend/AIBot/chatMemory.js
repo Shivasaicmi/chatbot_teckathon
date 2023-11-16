@@ -12,6 +12,7 @@ class ChatMemory {
         }else{
             const memory = await this.trainModelWithMemory(roomId);
             this.chatMemory[roomId] = memory;
+            console.log("returning memory");
             return memory;
         }
     }

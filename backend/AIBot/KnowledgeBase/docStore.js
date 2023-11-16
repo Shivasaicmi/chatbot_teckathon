@@ -1,13 +1,10 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { TextLoader } from "langchain/document_loaders/fs/text";
-import { CharacterTextSplitter } from "langchain/text_splitter";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { FaissStore } from "langchain/vectorstores/faiss";
 import { RetrievalQAChain, loadQAStuffChain } from "langchain/chains";
-import { chatModel } from "../model.js";
-
+import { chatModel } from "../Models/model.js";
 
 class Store{
 	embeddings = new OpenAIEmbeddings();
@@ -25,6 +22,7 @@ class Store{
 	}
 
 	async getResponseFromKnowledgeBase(message){
+		console.log("searching in knowledge base ......................................................................");
 		message = `/n The employee is trying to raise a greivance. the input is his greivance, take this greivance and suggest a department to the employee /n . The grievance is ${message} `;
 		return await this.knowledgeChain.call({
 			query:message
@@ -33,6 +31,4 @@ class Store{
 
 }
 
-
-
-export const createStore = new Store();
+export const store = new Store();

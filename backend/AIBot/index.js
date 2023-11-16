@@ -1,12 +1,16 @@
-import { openAiModel } from "./model.js";
+import { openAiModel } from "./Models/model.js";
 import { chatMemory } from "./chatMemory.js";
 import { ConversationChain } from "langchain/chains";
-import {createStore} from './KnowledgeBase/docStore.js';
+import {store} from './KnowledgeBase/docStore.js';
+import {getAgent} from "../AIBot/ChatAgent/ChatAgent.js";
 
 async function getConversationChain(roomId){
     try{
         const memory = await chatMemory.getChatMemoryByRoomId(roomId);
+        console.log("got the memory");
+        console.log("building the chain");
         const conversationChain = new ConversationChain({ llm: openAiModel, memory:memory });
+        console.log("returning the ConversationChain");
         return conversationChain;
     }
     catch(err){
@@ -15,12 +19,37 @@ async function getConversationChain(roomId){
 }
 
 async function respondWithContext(roomId,message){ 
-    const memoizedResponse = await (await getConversationChain(roomId)).call({input:message})
-    console.log(await createStore.getResponseFromKnowledgeBase(message));
+   let memoizedResponse = null;
+   try{
+        const conversationChain = await getConversationChain(roomId);
+        console.log("got the Conversation chain");
+        console.log("calling the conversation chain");
+        memoizedResponse = await conversationChain.call({input:message});
+        console.log("got the response");
+        console.log("returning the memoized response");
+   }
+   catch(err){
+    console.log(err);
+   }
+    
     return memoizedResponse;
 }
 
+async function getChatAgentResponse(message){
+    console.log("getting the agent");
+    const agent = getAgent();
+    console.log("got the agent");
+    try{
+        console.log("calling the agent ");
+        console.log(await agent.call({input:message}));
+        console.log("called the agent ");
+    }
+    catch(err){
+        console.log(err)
+    }
+}
 
 export const chatBot = {
-    respondWithContext
+    respondWithContext,
+    getChatAgentResponse
 }
