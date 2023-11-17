@@ -42,8 +42,14 @@ const runnableAgent = RunnableSequence.from([
     chatModel,
     new ReActSingleInputOutputParser({ toolNames }),
   ]);
-
-  const memory = new BufferMemory({memoryKey:'chat_history'});
+//   const roomObject = await RoomModel.findOne({roomId:roomId});
+//             const sessionId = roomObject._id;
+//             const collection = await RoomModel.prototype.collection;
+//   const memory = new BufferMemory({memoryKey:'chat_history',chatHistory: new MongoDBChatMessageHistory({
+//     collection,
+//     sessionId,
+// }),});
+const memory = new BufferMemory({memoryKey:'chat_history'})
 
 export function getAgent(){
     const executor = AgentExecutor.fromAgentAndTools({
