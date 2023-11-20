@@ -12,6 +12,8 @@ import { dirname } from 'path';
 import { RunnableSequence } from "langchain/schema/runnable";
 import { ReActSingleInputOutputParser } from "langchain/agents/react/output_parser";
 import { BufferMemory } from "langchain/memory";
+import { MongoDBChatMessageHistory } from "langchain/stores/message/mongodb";
+import { RoomModel } from "../../db_schemas/chat.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,8 +32,6 @@ const promptWithInputs = await chatAgentPrompt.partial({
     tool_names:toolNames.join(',')
 })
 
-console.log(toolNames);
-console.log(promptWithInputs);
 const runnableAgent = RunnableSequence.from([
     {
       input: (i) => i.input,
@@ -49,13 +49,24 @@ const runnableAgent = RunnableSequence.from([
 //     collection,
 //     sessionId,
 // }),});
-const memory = new BufferMemory({memoryKey:'chat_history'})
 
-export function getAgent(){
+async function getMemory(){
+    const collection = await RoomModel.prototype.collection;
+    const memory = new BufferMemory({memoryKey:'chat_history',chatHistory:new MongoDBChatMessageHistory({
+        collection,
+        sessionId:'6555db11cc3a4844cb1b526d'
+    })});
+    return memory;
+}
+
+
+
+
+export async function getAgent(){
     const executor = AgentExecutor.fromAgentAndTools({
         agent: runnableAgent,
         tools,
-        memory,
+        memory:await getMemory(),
     });
     return executor;
 }

@@ -37,12 +37,11 @@ async function respondWithContext(roomId,message){
 
 async function getChatAgentResponse(message){
     console.log("getting the agent");
-    const agent = getAgent();
+    const agent = await getAgent();
     console.log("got the agent");
     try{
         console.log("calling the agent ");
-        console.log(await agent.call({input:message}));
-        console.log("called the agent ");
+        return await agent.call({input:message});
     }
     catch(err){
         console.log(err)
