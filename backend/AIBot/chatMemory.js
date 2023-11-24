@@ -23,6 +23,7 @@ class ChatMemory {
             const sessionId = roomObject._id;
             const collection = await RoomModel.prototype.collection;
             const memory = new BufferMemory({
+                memoryKey:'chat_history',
                 chatHistory: new MongoDBChatMessageHistory({
                     collection,
                     sessionId,
