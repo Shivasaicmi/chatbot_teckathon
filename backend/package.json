@@ -23,6 +23,7 @@
     "nanoid": "^5.0.2",
     "node-fetch": "^3.3.2",
     "nodemon": "^3.0.1",
+    "readable-stream": "^4.4.2",
     "socket.io": "^4.7.2",
     "uuid": "^9.0.1",
     "web-streams-polyfill": "^3.2.1"

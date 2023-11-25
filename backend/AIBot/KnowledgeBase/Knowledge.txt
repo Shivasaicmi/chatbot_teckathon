@@ -17,3 +17,35 @@ Title: Travel, Hospitality and Admin
 Description: The Travel, Hospitality, and Admin team provides general administrative support, including:
 Scheduling meetings,Preparing documents,Providing information about company policies
 The Travel, Hospitality, and Admin team plays a crucial role in ensuring that the organization runs smoothly and efficiently.
+
+Location : Hyderabad
+Department :ICT 
+Mail Id : ict@comakeit.com
+
+Location : Hyderabad
+Department :HR 
+Mail Id : hr@comakeit.com
+
+Location : Hyderabad
+Department :Finance 
+Mail Id : finance@comakeit.com
+
+Location : Hyderabad
+Department :Admin 
+Mail Id : admin@comakeit.com
+
+Location : Delhi
+Department :ICT 
+Mail Id : ict@xebia.com
+
+Location : Delhi
+Department :HR 
+Mail Id : hr@xebia.com
+
+Location : Delhi
+Department :Finance 
+Mail Id : finance@xebia.com
+
+Location : Delhi
+Department :Admin 
+Mail Id : admin@xebia.com
