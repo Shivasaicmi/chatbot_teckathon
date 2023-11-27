@@ -57,8 +57,7 @@ mongoose.connect(process.env.mongodb_connection_url).then(()=>{
 chatIo.on('connection',(socket)=>{
     socket.on('sendMessage',async (message,roomId,acknowledge)=>{
         const room =await RoomModel.findOne({roomId:roomId});
-        console.log(room);
-        if(room.users.length!=1){
+        if(room.users.length==1){
             try{
                 const response = await chatBot.getChatAgentResponse(message,roomId);
                 const new_chatbot_message = {
@@ -79,11 +78,12 @@ chatIo.on('connection',(socket)=>{
                         content:message
                     }
                 }
-                const updated = await RoomModel.findByIdAndUpdate({roomId:roomId},
-                    { "$push": { "messages": new_chat } });
-                if(updated){
+                console.log("respoding with ",new_chat);
+                
+                const updatedRoom = await RoomModel.findOneAndUpdate({roomId:roomId},{ "$push": { "messages": new_chat } });
+                if(updatedRoom){
                     chatIo.to(roomId).emit('recieveMessage',new_chat); 
-                }
+                }   
             }
             catch{
                 acknowledge(null,new Error("Internal server error unable to send the message"));
@@ -134,7 +134,7 @@ chatIo.on('connection',(socket)=>{
             const rooms = await RoomModel.findOne({roomId:roomId,users:{
                 "$in":[socket.userName]
             }});
-            console.log("found the room with this id");
+           
             const messages = rooms.messages.filter((message)=> !message.information )
             if(rooms){
                 socket.join(roomId);
@@ -200,7 +200,6 @@ chatIo.on('connection',(socket)=>{
 app.use('/authentication',authenticationRouter);
 
 app.use('/istokenvalid',(req,res)=>{
-    console.log("validating the token");
     const authHeader = req.header('authorization');
     let token = null;
     if(authHeader && authHeader.startsWith('Bearer')){
@@ -233,8 +232,6 @@ app.get("/myGrievances",validateUser,async (req,res)=>{
     const {userEmail,role} = req;
     if(role==='admin'){
        const data = await GrievanceModel.find({email:userEmail,status:'active'});
-       console.log("the grievances are ");
-       console.log(data);
        res.status(200).json(data);
     }
     else{
