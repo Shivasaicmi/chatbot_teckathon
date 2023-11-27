@@ -8,6 +8,7 @@ import { validateToken } from "./jwtUtils/jwtUtils.js";
 import { nanoid } from "nanoid";
 import { RoomModel } from "./db_schemas/chat.js";
 import "web-streams-polyfill/dist/polyfill.es6.js";
+import GrievanceModel from "./db_schemas/grievanceModel.js";
 dotenv.config();
 
 const app = express();
@@ -37,6 +38,7 @@ chatIo.use((socket,next)=>{
 
     socket.userEmail = userDetails.userEmail;
     socket.userName = userDetails.userName;
+    socket.userLocation = 'hyderabad'
     next();
 
 })
@@ -54,34 +56,67 @@ mongoose.connect(process.env.mongodb_connection_url).then(()=>{
 
 chatIo.on('connection',(socket)=>{
     socket.on('sendMessage',async (message,roomId,acknowledge)=>{
-        
-        try{
-            const response = await chatBot.getChatAgentResponse(message,roomId);
-            const new_chatbot_message = {
-                type:'ai',
-                data:{content:response.output},
+        const room =await RoomModel.findOne({roomId:roomId});
+        console.log(room);
+        if(room.users.length!=1){
+            try{
+                const response = await chatBot.getChatAgentResponse(message,roomId);
+                const new_chatbot_message = {
+                    type:'ai',
+                    data:{content:response.output},
+                }
+                chatIo.to(roomId).emit('recieveMessage',new_chatbot_message);   
+            }
+            catch(error){
+                acknowledge(null,new Error("Internal server error unable to send the message"));
+            }
+        }
+        else{
+            try{
+                const new_chat = {
+                    type:'admin',
+                    data:{
+                        content:message
+                    }
+                }
+                const updated = await RoomModel.findByIdAndUpdate({roomId:roomId},
+                    { "$push": { "messages": new_chat } });
+                if(updated){
+                    chatIo.to(roomId).emit('recieveMessage',new_chat); 
+                }
+            }
+            catch{
+                acknowledge(null,new Error("Internal server error unable to send the message"));
 
             }
-            console.log("sending the response ");
-            console.log(new_chatbot_message);
-            chatIo.to(roomId).emit('recieveMessage',new_chatbot_message);   
         }
-        catch(error){
-            acknowledge(null,new Error("Internal server error unable to send the message"));
-        }
+        
        
     });
 
     socket.on('createRoom',async (roomName,acknowledge)=>{
         const chatId = nanoid(15);
-        const {userName,userEmail} = socket;
-
+        const {userName,userEmail,userLocation} = socket;
+        const context = `                            
+            \n The current roomId is ${chatId}\n
+            \n The current Human userEmail is ${userEmail}\n
+            \n The current Human location is ${userLocation} \n
+            \n The current grievanceName is ${roomName}_${userEmail.split('@')[0]}
+        `
         const new_room = {
             roomId:chatId,
             roomName:roomName,
             userEmail:userEmail,
             users:[userName],
-            chats:[]
+            messages:[
+                {
+                    type:'ai',
+                    information:true,
+                    data:{
+                        content:context
+                    }
+                }
+            ]
         }
 
         const room = await RoomModel.create(new_room);
@@ -99,10 +134,12 @@ chatIo.on('connection',(socket)=>{
             const rooms = await RoomModel.findOne({roomId:roomId,users:{
                 "$in":[socket.userName]
             }});
+            console.log("found the room with this id");
+            const messages = rooms.messages.filter((message)=> !message.information )
             if(rooms){
                 socket.join(roomId);
                 console.log("Joined the room ",roomId);
-                acknowledge(rooms.messages,null);
+                acknowledge(messages,null);
                 return;
             }
             else{
@@ -180,6 +217,31 @@ app.use('/istokenvalid',(req,res)=>{
         res.status(401).json({authenticated:false});
     }
 });
+
+app.get("/isAdmin",validateUser,(req,res)=>{
+    console.log("validating the role");
+    const {role} = req;
+    if(role==='admin'){
+        res.status(200).json({isAdmin:true});
+    }
+    else{
+        res.status(200).json({isAdmin:false});
+    }
+});
+
+app.get("/myGrievances",validateUser,async (req,res)=>{
+    const {userEmail,role} = req;
+    if(role==='admin'){
+       const data = await GrievanceModel.find({email:userEmail,status:'active'});
+       console.log("the grievances are ");
+       console.log(data);
+       res.status(200).json(data);
+    }
+    else{
+
+        res.status(400).json("Not permitted");
+    }
+})
 
 app.get("/",validateUser,(req,res)=>{
     res.status(200).send(

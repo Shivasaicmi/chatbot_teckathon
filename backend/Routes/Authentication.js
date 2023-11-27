@@ -24,7 +24,7 @@ authenticationRouter.post("/login",async (req,res)=>{
             res.status(403).json({message:"user credentials are wrong"});
             return;
        }
-       const token = generateToken(userEmail,userName);
+       const token = generateToken(userEmail,userName,user.role);
        res.status(200).json({token:token});
     }
     catch{

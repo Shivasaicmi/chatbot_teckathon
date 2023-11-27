@@ -4,7 +4,7 @@ import {store} from '../KnowledgeBase/docStore.js';
 const getKnowledgeBaseTool =()=> {
     return new DynamicTool({
         name:'KnowledgeBase',
-        description:`call this to the right department to approach. Call it with a {grievanceSummary} parameter `,
+        description:`call this to the right department to approach. Call it with a {grievanceSummary} parameter. search for departname and department email `,
         func: async (grievanceSummary)=>{
             try{
                 const response =  await store.getResponseFromKnowledgeBase(grievanceSummary);

@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
 const grievanceSchema = new mongoose.Schema({
+  email:{
+    type:String,
+    required:true
+  },
   summary: {
     type: String,
     required: true,
@@ -13,8 +17,21 @@ const grievanceSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  roomId:{
+    type:String,
+    required:true
+  },
+  status:{
+    type:String,
+    enum:['active','inactive'],
+    default:'active'
+  },
+  grievanceName:{
+    type:String,
+    required:true
+  }
 });
 
-const Grievance = mongoose.model("Grievance", grievanceSchema);
+const GrievanceModel = mongoose.model("Grievance", grievanceSchema);
 
-export default Grievance;
+export default GrievanceModel;

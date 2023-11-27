@@ -16,6 +16,8 @@ For example if the grievance raised by human is " I am having network issues ". 
 
 When you have enough information about the grievance . summarize it and use KnowledgeBase tool to recommend the department.
 
+you must raise the grievance using the tool at any cost. The end goal is to raise the grievance using the tool. make progress towards the goal.
+
 TOOLS:
 ------
 

@@ -12,45 +12,27 @@ mongoose.connect(mongoDBConnectionURL, {
   useUnifiedTopology: true,
 });
 
-// const getRaiseGrievanceTool = () => {
-//   return new DynamicTool({
-//     name: "RaiseGrievance",
-//     description: `call this to raise a grievance to the right department. Call it with a {grievanceSummary} and {team} parameter `,
-//     func: async (grievanceSummary, team) => {
-//       try {
-//         const grievance = new Grievance({
-//           summary: grievanceSummary,
-//           team: team,
-//         });
-//         await grievance.save();
-
-//         console.log("Grievance raised successfully");
-//         return "Grievance raised successfully";
-//       } catch (err) {
-//         console.error(err);
-//         return "Error raising grievance";
-//       }
-//     },
-//   });
-// };
-
 const getRaiseGrievanceTool = () => {
   return new DynamicTool({
     name: "RaiseGrievance",
-    description: `Call this function to raise a grievance. call it with atleast two parameters: {summaryOfGrievance} and {departmentOrTeamToApproach} `,
+    description: `Call this function to raise a grievance. call it with atleast two parameters: {summaryOfGrievance} and {departmentOrTeamToApproach} and {locationOfHuman} and {emailOfDepartment} and {roomId} and {grievanceName} `,
     func: async (summaryOfGrievance) => {
       try {
-        console.log(summaryOfGrievance);
         var keyValuePairs = summaryOfGrievance.replace(/[{}]/g, "").split(",");
         var dataObject = {};
         keyValuePairs.forEach(function (pair) {
           var [key, value] = pair.split(":");
-          dataObject[key.trim()] = value.trim();
+          if(value&&key){
+            dataObject[key.trim()] = value.trim();
+          }
         });
         console.log(dataObject);
         const grievance = new Grievance({
           summary: dataObject.summaryOfGrievance,
           team: dataObject.departmentOrTeamToApproach,
+          email:dataObject.emailOfDepartment,
+          roomId:dataObject.roomId,
+          grievanceName:dataObject.grievanceName
         });
         await grievance.save();
 
