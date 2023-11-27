@@ -38,6 +38,7 @@ chatIo.use((socket,next)=>{
 
     socket.userEmail = userDetails.userEmail;
     socket.userName = userDetails.userName;
+    socket.role = userDetails.role;
     socket.userLocation = 'hyderabad'
     next();
 
@@ -73,7 +74,8 @@ chatIo.on('connection',(socket)=>{
         else{
             try{
                 const new_chat = {
-                    type:'admin',
+                    type:socket.role,
+                    userEmail:socket.userEmail,
                     data:{
                         content:message
                     }
@@ -93,6 +95,16 @@ chatIo.on('connection',(socket)=>{
         
        
     });
+
+    socket.on('isAiChatting',async (roomId,acknowledge)=>{
+       const room = await RoomModel.findOne({roomId:roomId});
+       if(room.users.length==1){
+        acknowledge('yes');
+        return;
+       }
+       acknowledge('no');
+
+    })
 
     socket.on('createRoom',async (roomName,acknowledge)=>{
         const chatId = nanoid(15);
@@ -135,8 +147,8 @@ chatIo.on('connection',(socket)=>{
                 "$in":[socket.userName]
             }});
            
-            const messages = rooms.messages.filter((message)=> !message.information )
             if(rooms){
+                const messages = rooms.messages.filter((message)=> !message.information );
                 socket.join(roomId);
                 console.log("Joined the room ",roomId);
                 acknowledge(messages,null);
@@ -146,7 +158,8 @@ chatIo.on('connection',(socket)=>{
                 acknowledge([],null);
             }
         }
-        catch{
+        catch(err){
+            console.log(err);
             acknowledge(null,new Error("cannot fetch the messages"));
         }
         
@@ -173,7 +186,7 @@ chatIo.on('connection',(socket)=>{
 
     socket.on('getRoomsByUserName',async (acknowledge)=>{
         try{
-            const result = await RoomModel.find({users:{ "$in":[socket.userName] }});
+            const result = await RoomModel.find({userEmail:socket.userEmail});
             if(result){
                 const rooms = result.map((room)=>{
                     return {

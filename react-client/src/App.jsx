@@ -54,7 +54,7 @@ function App() {
             <Route path='/authentication' element={<Authentication setAuthentication={setIsAuthenticated} />} />
             <Route path='/chatbot' element={ 
               isAuthenticated? 
-              <ChatPage/>:
+              <ChatPage />:
               <Navigate to="/authentication?mode=login"  />
             
             } />

@@ -46,6 +46,7 @@ function Authentication({ setAuthentication }) {
         if (token) {
           localStorage.setItem("token", token);
           setAuthentication(true);
+          localStorage.setItem('userEmail',userCredentials.userEmail);
           navigate("/chatbot");
         }
       })
@@ -56,15 +57,13 @@ function Authentication({ setAuthentication }) {
       });
   }
  
-       
-
-
     function register(userCredentials){
         console.log("trying to register the user");
         backend.post('/authentication/register',userCredentials).then((response)=>{
             const token = response.data.token;
             if(token){
                 localStorage.setItem('token',token);
+                localStorage.setItem('userEmail',userCredentials.userEmail);
                 setAuthentication(true)
                 navigate('/chatbot')
             }

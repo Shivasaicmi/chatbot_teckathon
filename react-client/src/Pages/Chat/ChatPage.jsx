@@ -17,6 +17,7 @@ function ChatPage() {
   const [chatRoomError, setChatRoomError] = useState(false);
   const [grievances,setGrievances] = useState([]);
   const [toggleGrievance,setToggleGrievance] = useState(false);
+  const userEmail = localStorage.getItem('userEmail');
 
   const [isAdmin,setIsAdmin] = useState(false);
 
@@ -87,16 +88,22 @@ function ChatPage() {
   function handleSubmit(event) {
     event.preventDefault();
     const message = inputRef.current.value;
-    const newHumanMessage = {
-      type:'human',
-      data:{
-        content:message
-      }
-    }
 
-    setMessages((previousMessages)=>{
-      return [...previousMessages,newHumanMessage];
+    socket.emit('isAiChatting',currentRoomId,(answer)=>{
+      if(answer==='yes'){
+        const newHumanMessage = {
+          type:'human',
+          data:{
+            content:message
+          }
+        }
+    
+        setMessages((previousMessages)=>{
+          return [...previousMessages,newHumanMessage];
+        })
+      }
     })
+    
     if (message && currentRoomId) {
       socket.emit('sendMessage', message, currentRoomId, (responseData, error) => {
         console.log(responseData);
@@ -114,7 +121,7 @@ function ChatPage() {
           return;
         }
         if (joinedRoom) {
-          getMessagesOfRoom();
+          getMessagesOfRoom(roomId);
           setChatHistory((previousState) => {
             return [...previousState, joinedRoom];
           });
@@ -126,9 +133,11 @@ function ChatPage() {
   function getMessagesOfRoom(roomId) {
     socket.emit("getMessagesofRoom", roomId, (messages, error) => {
       if (error) {
+        console.log(error);
         alert("Cannot get messages of room");
         return;
       }
+      console.log(messages);
       setMessages(messages);
     });
   }
@@ -178,7 +187,6 @@ function ChatPage() {
           {
             toggleGrievance ? 
               <>
-              {console.log(grievances)}
                 {
                   // 
                   grievances.map((grievance,index)=>{
@@ -219,7 +227,14 @@ function ChatPage() {
                 className={`rounded-2xl p-3 ${
                   chat.type === 'ai'
                     ? 'bg-primary text-secondary float-left max-w-[55%] border inline-block mb-1'
-                    : 'bg-success text-black-900 float-right max-w-[55%] border-black  border inline-block mb-1 mr-3'
+                    :chat.type==='human'? 'bg-success text-black-900 float-right max-w-[55%] border-black  border inline-block mb-1 mr-3': 
+                      
+                        
+                        chat.userEmail === userEmail ?
+                        'bg-success text-black-900 float-right max-w-[55%] border-black  border inline-block mb-1 mr-3':
+                        'border-primary text-primary float-left max-w-[55%] border inline-block mb-1'
+                      
+                    
                 } `}
               >
                 {chat.data.content}
