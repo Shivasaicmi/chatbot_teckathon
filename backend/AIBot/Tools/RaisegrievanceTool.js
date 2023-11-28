@@ -15,14 +15,14 @@ mongoose.connect(mongoDBConnectionURL, {
 const getRaiseGrievanceTool = () => {
   return new DynamicTool({
     name: "RaiseGrievance",
-    description: `Call this function to raise a grievance. call it with atleast two parameters: {summaryOfGrievance} and {departmentOrTeamToApproach} and {locationOfHuman} and {emailOfDepartment} and {roomId} and {grievanceName} `,
+    description: `Call this function to raise a grievance. call it with atleast two parameters: {summaryOfGrievance} and {departmentOrTeamToApproach} and {locationOfHuman} and {emailOfDepartment} and {roomId} and {grievanceName} call it to the concerned department of the same location`,
     func: async (summaryOfGrievance) => {
       try {
         var keyValuePairs = summaryOfGrievance.replace(/[{}]/g, "").split(",");
         var dataObject = {};
         keyValuePairs.forEach(function (pair) {
           var [key, value] = pair.split(":");
-          if(value&&key){
+          if (value && key) {
             dataObject[key.trim()] = value.trim();
           }
         });
@@ -30,9 +30,9 @@ const getRaiseGrievanceTool = () => {
         const grievance = new Grievance({
           summary: dataObject.summaryOfGrievance,
           team: dataObject.departmentOrTeamToApproach,
-          email:dataObject.emailOfDepartment,
-          roomId:dataObject.roomId,
-          grievanceName:dataObject.grievanceName
+          email: dataObject.emailOfDepartment,
+          roomId: dataObject.roomId,
+          grievanceName: dataObject.grievanceName,
         });
         await grievance.save();
 

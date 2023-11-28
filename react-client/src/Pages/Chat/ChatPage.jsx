@@ -1,69 +1,75 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useRef, useState } from "react";
-import io from 'socket.io-client';
+import io from "socket.io-client";
 import { useNavigate } from "react-router-dom";
 import { backend } from "../../AxiosInstances/BackendInstance";
-import './chatPage.css';
+import "./ChatPage.css";
 
 function ChatPage() {
   const navigate = useNavigate();
   const inputRef = useRef(null);
   const chatNameRef = useRef(null);
-  const token = localStorage.getItem('token');
-  const [socket] = useState(() => io('http://localhost:8080/chat', { auth: { token: token ? token : null } }));
+  const token = localStorage.getItem("token");
+  const [socket] = useState(() =>
+    io("http://localhost:8080/chat", { auth: { token: token ? token : null } })
+  );
   const [messages, setMessages] = useState([]);
   const [chatHistory, setChatHistory] = useState([]);
   const [currentRoomId, setCurrentRoomId] = useState(null);
   const [chatRoomError, setChatRoomError] = useState(false);
-  const [grievances,setGrievances] = useState([]);
-  const [toggleGrievance,setToggleGrievance] = useState(false);
-  const userEmail = localStorage.getItem('userEmail');
+  const [grievances, setGrievances] = useState([]);
+  const [toggleGrievance, setToggleGrievance] = useState(false);
+  const userEmail = localStorage.getItem("userEmail");
 
-  const [isAdmin,setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     function connectToChatSession() {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        navigate('/authentication?mode=login');
+        navigate("/authentication?mode=login");
         return;
       }
-      socket.on('connect', () => { });
+      socket.on("connect", () => {});
     }
     connectToChatSession();
   }, []);
 
-  useEffect(()=>{
-    if(isAdmin){
-      backend.get('/myGrievances',{
-        headers:{
-          authorization:`Bearer ${token}`
-        }
-      }).then((response)=>{
-        setGrievances(response.data);
-      }).catch((err)=>{
-       
-      });
+  useEffect(() => {
+    if (isAdmin) {
+      backend
+        .get("/myGrievances", {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          setGrievances(response.data);
+        })
+        .catch((err) => {});
     }
-  },[isAdmin]);
+  }, [isAdmin]);
 
-  useEffect(()=>{
-    backend.get("/isAdmin",{
-      headers:{
-        authorization:`Bearer ${token}`
-      }
-    }).then((response)=>{
-      setIsAdmin(response.data.isAdmin);
-    }).catch((err)=>{
-      setIsAdmin(false);
-    })
-  },[])
+  useEffect(() => {
+    backend
+      .get("/isAdmin", {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      })
+      .then((response) => {
+        setIsAdmin(response.data.isAdmin);
+      })
+      .catch((err) => {
+        setIsAdmin(false);
+      });
+  }, []);
 
   useEffect(() => {
     function recieveMessage() {
-      socket.on('recieveMessage', (message) => {
+      socket.on("recieveMessage", (message) => {
         setMessages((previousState) => {
-          return [...previousState,message];
+          return [...previousState, message];
         });
       });
     }
@@ -72,7 +78,7 @@ function ChatPage() {
 
   useEffect(() => {
     function getRooms() {
-      socket.emit('getRoomsByUserName', (rooms, error) => {
+      socket.emit("getRoomsByUserName", (rooms, error) => {
         if (error) {
           alert("Cannot fetch previous chats");
           return;
@@ -89,33 +95,43 @@ function ChatPage() {
     event.preventDefault();
     const message = inputRef.current.value;
 
-    socket.emit('isAiChatting',currentRoomId,(answer)=>{
-      if(answer==='yes'){
+    socket.emit("isAiChatting", currentRoomId, (answer) => {
+      if (answer === "yes") {
         const newHumanMessage = {
-          type:'human',
-          data:{
-            content:message
-          }
-        }
-    
-        setMessages((previousMessages)=>{
-          return [...previousMessages,newHumanMessage];
-        })
+          type: "human",
+          data: {
+            content: message,
+          },
+        };
+
+        setMessages((previousMessages) => {
+          return [...previousMessages, newHumanMessage];
+        });
       }
-    })
-    
+    });
+
     if (message && currentRoomId) {
-      socket.emit('sendMessage', message, currentRoomId, (responseData, error) => {
-        console.log(responseData);
-        console.log(error);
-      });
+      socket.emit(
+        "sendMessage",
+        message,
+        currentRoomId,
+        (responseData, error) => {
+          console.log(responseData);
+          console.log(error);
+        }
+      );
       inputRef.current.value = "";
     }
   }
 
+  function logout() {
+    localStorage.clear();
+    navigate("/authentication?mode=login");
+  }
+
   function joinRoom(roomId) {
     if (roomId) {
-      socket.emit('joinRoom', roomId, (joinedRoom, error) => {
+      socket.emit("joinRoom", roomId, (joinedRoom, error) => {
         if (error) {
           alert("Cannot fetch chats");
           return;
@@ -144,12 +160,11 @@ function ChatPage() {
 
   function createChatRoom() {
     const roomName = chatNameRef.current.value;
-    if(roomName === "")
-    {
+    if (roomName === "") {
       setChatRoomError(true);
-      return ;
+      return;
     }
-    socket.emit('createRoom', roomName, (response,_err) => {
+    socket.emit("createRoom", roomName, (response, _err) => {
       if (response) {
         setChatHistory((previousState) => {
           return [...previousState, response];
@@ -159,64 +174,86 @@ function ChatPage() {
         console.warn("Room cannot be created");
       }
       chatNameRef.current.value = "";
-    })
+    });
   }
 
-  function toggleChats(event){
+  function toggleChats(event) {
     setToggleGrievance(event.target.checked);
   }
 
   return (
     <section className="h-screen w-screen flex p-5">
-      
       <div className="chat_history h-full w-1/4 p-5 bg-success rounded-lg">
         <div className="lavender-bg p-4 rounded-lg">
-          <input ref={chatNameRef} type="text" placeholder="Enter chat name" className={`w-full h-9 mb-5 rounded-lg pl-3 lavender-bg text-black ${ chatRoomError ?'border border-red-500':''}`}/>
-          <button onClick={createChatRoom} className="bg-next text-white w-full h-8 rounded-xl hover:bg-primary transition-colors duration-300 ease-in-out">
+          <input
+            ref={chatNameRef}
+            type="text"
+            placeholder="Enter chat name"
+            className={`w-full h-9 mb-5 rounded-lg pl-3 lavender-bg text-black ${
+              chatRoomError ? "border border-red-500" : ""
+            }`}
+          />
+          <button
+            onClick={createChatRoom}
+            className="bg-next text-white w-full h-8 rounded-xl hover:bg-primary transition-colors duration-300 ease-in-out"
+          >
             New chat
+          </button>
+          <button
+            onClick={logout}
+            className="mt-3 bg-next text-white w-full h-8 rounded-xl hover:bg-primary transition-colors duration-300 ease-in-out"
+          >
+            Logout
           </button>
           <div className="border-t border-b border-primary my-5"></div>
         </div>
         <div className="chats flex flex-col gap-4">
-          {isAdmin? <div>
-            <label className="switch">
-              <input type="checkbox" onChange={toggleChats} />
-              <span className="slider round"></span>
-            </label>
-          </div> : null }
-          {
-            toggleGrievance ? 
-              <>
-                {
-                  // 
-                  grievances.map((grievance,index)=>{
-                  return <button
+          {isAdmin ? (
+            <div>
+              <label className="switch">
+                <input type="checkbox" onChange={toggleChats} />
+                <span className="slider round"></span>
+                <label>Grievances</label>
+              </label>
+            </div>
+          ) : null}
+          {toggleGrievance ? (
+            <>
+              {
+                //
+                grievances.map((grievance, index) => {
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setCurrentRoomId(grievance.roomId);
+                        getMessagesOfRoom(grievance.roomId);
+                        joinRoom(grievance.roomId);
+                      }}
+                      className="w-full pt-2 pb-2 rounded-md bg-next hover:bg-primary text-white hover-text-black transition-colors duration-300 ease-in-out"
+                    >
+                      {grievance.grievanceName}
+                    </button>
+                  );
+                })
+              }
+            </>
+          ) : (
+            <>
+              {chatHistory.map((room, index) => (
+                <button
                   key={index}
-                  onClick={()=>{
-                    setCurrentRoomId(grievance.roomId);
-                    getMessagesOfRoom(grievance.roomId);
-                    joinRoom(grievance.roomId);
+                  onClick={() => {
+                    setCurrentRoomId(room.roomId);
+                    getMessagesOfRoom(room.roomId);
                   }}
                   className="w-full pt-2 pb-2 rounded-md bg-next hover:bg-primary text-white hover-text-black transition-colors duration-300 ease-in-out"
-                  >
-                    {grievance.grievanceName}
-                  </button>
-                })}
-              </>
-              : 
-              <>
-              {chatHistory.map((room, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  setCurrentRoomId(room.roomId);
-                  getMessagesOfRoom(room.roomId);
-                }}
-                className="w-full pt-2 pb-2 rounded-md bg-next hover:bg-primary text-white hover-text-black transition-colors duration-300 ease-in-out">
-                {room.roomName}
-              </button>
-            ))}</>
-          }
+                >
+                  {room.roomName}
+                </button>
+              ))}
+            </>
+          )}
         </div>
       </div>
       <div className="chat_window w-3/4 pl-5 pr-5 bg-secondary rounded-lg">
@@ -225,26 +262,31 @@ function ChatPage() {
             <div key={index} className="max-w-[100%]">
               <div
                 className={`rounded-2xl p-3 ${
-                  chat.type === 'ai'
-                    ? 'bg-primary text-secondary float-left max-w-[55%] border inline-block mb-1'
-                    :chat.type==='human'? 'bg-success text-black-900 float-right max-w-[55%] border-black  border inline-block mb-1 mr-3': 
-                      
-                        
-                        chat.userEmail === userEmail ?
-                        'bg-success text-black-900 float-right max-w-[55%] border-black  border inline-block mb-1 mr-3':
-                        'border-primary text-primary float-left max-w-[55%] border inline-block mb-1'
-                      
-                    
+                  chat.type === "ai"
+                    ? "bg-primary text-secondary float-left max-w-[55%] border inline-block mb-1"
+                    : chat.type === "human"
+                    ? "bg-success text-black-900 float-right max-w-[55%] border-black  border inline-block mb-1 mr-3"
+                    : chat.userEmail === userEmail
+                    ? "bg-success text-black-900 float-right max-w-[55%] border-black  border inline-block mb-1 mr-3"
+                    : "border-primary text-primary float-left max-w-[55%] border inline-block mb-1"
                 } `}
               >
                 {chat.data.content}
               </div>
             </div>
           ))}
-		<div className="empty container h-4 " ></div>
+          <div className="empty container h-4 "></div>
         </div>
-        <form className="w-full mt-5 flex justify-between" onSubmit={handleSubmit} >
-          <input className="h-10 w-3/4 border border-primary rounded-l pl-3" ref={inputRef} type="text" placeholder="Enter the message" />
+        <form
+          className="w-full mt-5 flex justify-between"
+          onSubmit={handleSubmit}
+        >
+          <input
+            className="h-10 w-3/4 border border-primary rounded-l pl-3"
+            ref={inputRef}
+            type="text"
+            placeholder="Enter the message"
+          />
           <button className="w-[20%] bg-next text-secondary rounded-r p-2 hover:bg-primary transition-colors duration-300 ease-in-out">
             Send
           </button>
