@@ -20,32 +20,32 @@ The Travel, Hospitality, and Admin team plays a crucial role in ensuring that th
 
 Location : Hyderabad
 Department :ICT 
-Mail Id : ict@comakeit.com
+Mail Id : ict-hyderabad@comakeit.com
 
 Location : Hyderabad
 Department :HR 
-Mail Id : hr@comakeit.com
+Mail Id : hr-hyderabad@comakeit.com
 
 Location : Hyderabad
 Department :Finance 
-Mail Id : finance@comakeit.com
+Mail Id : finance-hyderabad@comakeit.com
 
 Location : Hyderabad
 Department :Admin 
-Mail Id : admin@comakeit.com
+Mail Id : admin-hyderabad@comakeit.com
 
 Location : Delhi
 Department :ICT 
-Mail Id : ict@xebia.com
+Mail Id : ict-delhi@xebia.com
 
 Location : Delhi
 Department :HR 
-Mail Id : hr@xebia.com
+Mail Id : hr-delhi@xebia.com
 
 Location : Delhi
 Department :Finance 
-Mail Id : finance@xebia.com
+Mail Id : finance-delhi@xebia.com
 
 Location : Delhi
 Department :Admin 
-Mail Id : admin@xebia.com
+Mail Id : admin-delhi@xebia.com
